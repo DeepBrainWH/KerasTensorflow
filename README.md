@@ -2,13 +2,18 @@
 keras backend Tensorlow tutorial
 
 ## Environment
-  ununtu16.04 (this is my operate system, maybe you can run these code in you windows OS or Mac OS, 
+  ununtu16.04 (this is my operate system, maybe you can run these code in you 
+  windows OS or Mac OS, 
   it is not having a strict restricting)<br/>
   python 3.6<br/>
   tensorflow-gpu==1.0.0 (or tensorflow cpu)<br/>
+  
+  
   keras<br/>
   cuda-9.0
   cudnn-7
+  
+  """---"""
 You can install them by:
   pip install tensorflow-gpu==1.0.0
   pip install keras
