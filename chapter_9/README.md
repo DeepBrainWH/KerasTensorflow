@@ -7,5 +7,3 @@
 <p align="left">
     <img src="images/gradient_descent.png"/>
 </p>
-  
-  ax^{2} + by^{2} + c = 0 
