@@ -20,4 +20,3 @@ such as :
   recognizing handwritten digts
   classify cafir image data
   and so on.
-\frac{3}{5} \sum_{6}^{7}
