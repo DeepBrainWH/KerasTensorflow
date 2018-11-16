@@ -25,8 +25,6 @@ x_test = x_test.reshape(10000, 784).astype('float32')
 # In[4]:
 
 
-x_train[0]
-
 
 # ## 数据标准化，提高模型预测的准确度，并且加快收敛素的
 
@@ -46,8 +44,6 @@ y_test_onehot = np_utils.to_categorical(y_test)
 
 # In[7]:
 
-
-y_trian_onehot[0]
 
 
 # #### 建立模型
@@ -141,8 +137,6 @@ prediction = model.predict_classes(x_test)
 # In[18]:
 
 
-prediction
-
 
 # In[19]:
 
@@ -186,13 +180,12 @@ pd.crosstab(y_test, prediction, rownames=['label'], colnames=['predict'])
 
 
 df = pd.DataFrame({'label': y_test, 'predict': prediction})
-df[:3]
+
 
 
 # In[33]:
 
 
-df[(df.label==5)&(df.predict==3)]
 
 
 # In[34]:
