@@ -52,12 +52,14 @@ class MyLSTM():
             if model_path is None:
                 model_path = './model_tensorboard_2.h5'
             mymodel = load_model(model_path)
-            history = mymodel.fit(self.x_train, self.y_train, batch_size=50, epochs=500, verbose=0, validation_split=0.2, callbacks=[TensorBoard()])
+            print('retrain model...........')
+            history = mymodel.fit(self.x_train, self.y_train, batch_size=50, epochs=500, verbose=0, validation_split=0.2, callbacks=[TensorBoard('./logs2')])
             self.history = history.history
             mymodel.save('./model_tensorboard_2.h5')
             self.model = mymodel
             self._write_val_loss_to_csv()
         except:
+            print('train new model.........')
             start = datetime.datetime.now()
             mymodel = Sequential()
             mymodel.add(CuDNNLSTM(50, input_shape=(20, 1), return_sequences=True))

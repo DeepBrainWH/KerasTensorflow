@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 
-df2 = pd.read_csv("./wangheng/val_loss.csv")
+df2 = pd.read_csv("./wangheng/val_loss_2.csv")
 val_loss_2 = df2.iloc[:, -1].values
 plt.figure(figsize=(20, 10))
 plt.plot(val_loss_2)
