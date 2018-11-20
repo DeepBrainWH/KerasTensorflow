@@ -6,14 +6,15 @@ from tensorflow.python.keras.layers import Dense, RNN, Layer
 from tensorflow.python.keras import backend as K
 from tensorflow.python.keras import Input, activations
 from tensorflow.python.keras.models import Sequential, Model, load_model
-from tensorflow.python.keras.utils import multi_gpu_model
+from tensorflow.python.keras.callbacks import TensorBoard
+from tensorflow.python.keras.backend import batch_normalization
 import pandas as pd
 import numpy as np
 
 
 class MinimalRNNCell(Layer):
 
-    def __init__(self, units=32, activation="tanh", **kwargs):
+    def __init__(self, units=32, activation="sigmoid", **kwargs):
         self.units = units
         self.state_size = units
         self.activation = activation
@@ -50,7 +51,7 @@ class BuildModel():
         self.x_train = None
         self.y_train = None
         self.history = None
-        self.filename = r"../../data/all_part"
+        self.filename = r"../../../data/all_part"
         self.original_data = pd.read_csv(self.filename, sep="\t")
 
     def __get_data(self):
@@ -61,9 +62,9 @@ class BuildModel():
             x.append(data[i:i + self.TIMESTEP])
             y.append(data[i + self.TIMESTEP])
         x = np.asarray(x, dtype=np.float32)
-        x = x / x.max()
+        x = (x - x.min()) / (x.max() - x.min())
         y = np.asarray(y, dtype=np.float32)
-        y = y / y.max()
+        y = (y - y.min()) / (y.max() - y.min())
         self.x_train = x.reshape([x.shape[0], x.shape[1], 1])
         self.y_train = y.reshape([y.shape[0], 1])
         self.input = Input(shape=(20, 1), name="input_tensor")
@@ -73,10 +74,13 @@ class BuildModel():
         :return: the output tensor.
         """
         o1 = RNN(MinimalRNNCell(32, "tanh"), return_sequences=True)(self.input)
+        o1 = batch_normalization(o1, 0, 1, 0, 1)
         o2 = RNN(MinimalRNNCell(32, "tanh"), return_sequences=True)(o1)
+        # o2 = batch_normalization(o2, 0, 1, 0, 1)
         o3 = RNN(MinimalRNNCell(32, "tanh"), return_sequences=True)(o2)
+        # o3 = batch_normalization(o3, 0, 1, 0, 1)
         o4 = RNN(MinimalRNNCell(32, "tanh"), return_sequences=False)(o3)
-        o5 = Dense(1, activation="tanh")(o4)
+        o5 = Dense(1, activation="relu")(o4)
         self.output = o5
 
     def build_model(self):
@@ -88,19 +92,20 @@ class BuildModel():
         if self.model is None:
             try:
                 self.model = load_model("model_sec.h5")
-                parallel_model = multi_gpu_model(self.model, gpus=1)
-                self.history = parallel_model.fit(self.x_train, self.y_train, 20, epochs=50, verbose=2)
-                parallel_model.save("./model_sec.h5")
+                self.history = self.model.fit(self.x_train, self.y_train, 20, epochs=50, verbose=2)
+                self.model.save("./model_sec.h5")
             except:
                 if not isinstance(self.model, Sequential):
+                    print(self.input.shape, self.output.shape)
                     self.model = Model(inputs=self.input, outputs=self.output)
-                    self.model.compile("adam", loss="mse", metrics=["mae"])
                     print(self.model.summary())
-                    self.model.fit(self.x_train, self.y_train, 20, 50, 2, validation_split=0.2)
+                    self.model.compile("adam", loss="mae", metrics=["mae"])
+                    print(self.model.summary())
+                    self.model.fit(self.x_train, self.y_train, 100, 50, 0, validation_split=0.2, callbacks=[TensorBoard('./logs')])
                     self.model.save("./model_sec.h5")
 
 
 if __name__ == "__main__":
-    # mymodel = BuildModel()
-    # mymodel.build_model()
-    mymodel = load_model(r"model_sec.h5",custom_objects={"MinimalRNNCell":MinimalRNNCell})
+    mymodel = BuildModel()
+    mymodel.build_model()
+    # mymodel = load_model(r"model_sec.h5",custom_objects={"MinimalRNNCell":MinimalRNNCell})
