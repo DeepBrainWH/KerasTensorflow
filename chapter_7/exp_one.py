@@ -110,10 +110,7 @@ def show_train_history(train_history, train, validation):
     plt.legend(['train', 'validation'], loc='upper left')
     plt.show()
 
-
 # In[15]:
-
-
 show_train_history(train_history, 'acc', 'val_acc')
 
 
@@ -121,10 +118,8 @@ show_train_history(train_history, 'acc', 'val_acc')
 
 # In[16]:
 
-
 scores = model.evaluate(x_test, y_test_onehot)
 print('accuracy = ', scores[1])
-
 
 # ### 进行预测
 
@@ -151,12 +146,12 @@ def plot_images_labels_prediction(images, labels, prediction, idx, num=10):
         title = 'label=' + str(labels[idx])
         if len(prediction) > 0:
             title += ", predict = " + str(prediction[idx])
-            
+
         ax.set_title(title, fontsize=10)
         ax.set_xticks([])
         ax.set_yticks([])
         idx+=1
-    plt.show()        
+    plt.show()
 
 
 # In[20]:
@@ -198,4 +193,3 @@ plot_images_labels_prediction(x_test_image, y_test, prediction, idx=340, num=1)
 
 
 plot_images_labels_prediction(x_test_image, y_test, prediction, idx=4271, num=1)
-
