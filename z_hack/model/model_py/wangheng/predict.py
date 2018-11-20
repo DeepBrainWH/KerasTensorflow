@@ -32,7 +32,7 @@ class Predict:
             dataframe = pd.read_csv(datafile, sep='\t')
             np_price = dataframe.iloc[:, -1].values
             np_price = (np_price - np_price.min()) / (np_price.max() - np_price.min())
-            np_price = np_price[-20:]
+            np_price = np_price[0:20]
             return np.asarray(np_price, dtype=np.float32).reshape(1, 20, 1)
         except:
             raise FileNotFoundError('Please input correct data file path!')
@@ -46,11 +46,11 @@ if __name__ == '__main__':
         sys.exit(0)
     else:
         y = []
-        model_path = './model_tensorboard_1.h5'
+        model_path = './model_tensorboard.h5'
         predict = Predict()
         old_data = predict.get_data()
         for i in range(22):
             predict_data, old_data = predict.predict(old_data, model_path)
             y.append(predict_data * 4920.613604 + 2872.819729)
-        y = np.asarray(y, dtype=np.float32)
+        y = np.asarray(y, dtype=np.float32).reshape(-1)
         print(y)

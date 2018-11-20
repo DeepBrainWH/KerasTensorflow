@@ -34,9 +34,9 @@ class MyLSTM():
         self.TRAININGEXAMPLE = self.original_data.shape[0]
         x = []
         y = []
-        for i in range(self.TRAININGEXAMPLE - self.TIMESTEP):
+        for i in range(self.TRAININGEXAMPLE - self.TIMESTEP * 2 - 2):
             x.append(self.original_data[i: i+self.TIMESTEP])
-            y.append(self.original_data[i+self.TIMESTEP])
+            y.append(self.original_data[i+self.TIMESTEP:i + self.TIMESTEP*2 + 2])
 
         x = np.asarray(x, dtype=np.float32)
         y = np.asarray(y, dtype=np.float32)
@@ -44,17 +44,17 @@ class MyLSTM():
         x = (x - self.train_data_min) / (self.train_data_max - self.train_data_min)
         y = (y - self.train_data_min) / (self.train_data_max - self.train_data_min)
         self.x_train = np.reshape(x, newshape=[x.shape[0], x.shape[1], 1])
-        self.y_train = np.reshape(y, newshape=[y.shape[0], 1])
+        self.y_train = np.reshape(y, newshape=[y.shape[0], y.shape[1]])
         return self.x_train, self.y_train
 
     def buildModel(self, model_path=None):
         try:
             if model_path is None:
-                model_path = './model_tensorboard_1.h5'
+                model_path = './model_tensorboard_2.h5'
             mymodel = load_model(model_path)
             history = mymodel.fit(self.x_train, self.y_train, batch_size=50, epochs=500, verbose=0, validation_split=0.2, callbacks=[TensorBoard()])
             self.history = history.history
-            mymodel.save('./model_tensorboard_1.h5')
+            mymodel.save('./model_tensorboard_2.h5')
             self.model = mymodel
             self._write_val_loss_to_csv()
         except:
@@ -83,14 +83,14 @@ class MyLSTM():
             mymodel.add(BatchNormalization())
             mymodel.add(Dropout(0.2))
 
-            mymodel.add(Dense(1, activation='linear'))
+            mymodel.add(Dense(22, activation='relu'))
 
             mymodel.compile('adam', 'mae', metrics=['mae'])
             print(mymodel.summary())
             self.model = mymodel
-            history = mymodel.fit(self.x_train, self.y_train, batch_size=50, epochs=3000, verbose=1, validation_split=0.2, callbacks=[TensorBoard()])
+            history = mymodel.fit(self.x_train, self.y_train, batch_size=50, epochs=3000, verbose=2, validation_split=0.2, callbacks=[TensorBoard()])
             self.history = history.history
-            mymodel.save('./model_tensorboard_1.h5')
+            mymodel.save('./model_tensorboard_2.h5')
             end = datetime.datetime.now()
             print('耗时',end-start)
             self._write_val_loss_to_csv()
@@ -99,7 +99,7 @@ class MyLSTM():
         val_loss = self.history['val_loss']
         val_loss = np.asarray(val_loss, dtype=np.float32)
         df = pd.DataFrame(val_loss)
-        df.to_csv('./val_loss_1.csv', mode='a', header=False)
+        df.to_csv('./val_loss_2.csv', mode='a', header=False)
 if __name__ == '__main__':
     mylstm = MyLSTM()
     x_train, y_train = mylstm.get_data()

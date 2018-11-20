@@ -9,6 +9,8 @@ import sys
 import pandas as pd
 import numpy as np
 from tensorflow.python.keras.models import load_model
+from model_2_RNN import MinimalRNNCell
+
 
 class Predict:
 
@@ -34,7 +36,7 @@ class Predict:
             dataframe = pd.read_csv(datafile, sep='\t')
             np_price = dataframe.iloc[:, -1].values
             np_price = (np_price - np_price.min()) / (np_price.max() - np_price.min())
-            np_price = np_price[-20:]
+            np_price = np_price[10:30]
             return np.asarray(np_price, dtype=np.float32).reshape(1, 20, 1)
         except:
             raise FileNotFoundError('Please input correct data file path!')
@@ -47,7 +49,7 @@ if total < 1:
     sys.exit(0)
 else:
     y = []
-    model_path = './model_fifth.h5'
+    model_path = './model_sec.h5'
     predict = Predict()
     old_data = predict.get_data()
     for i in range(22):

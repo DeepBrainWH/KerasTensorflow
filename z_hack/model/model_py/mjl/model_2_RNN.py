@@ -2,12 +2,11 @@
 """
     此模型是z-hack算法比赛的另外一个模型，使用RNN进行训练和预测
 """
-from tensorflow.python.keras.layers import Dense, RNN, Layer
+from tensorflow.python.keras.layers import Dense, RNN, Layer, BatchNormalization
 from tensorflow.python.keras import backend as K
 from tensorflow.python.keras import Input, activations
 from tensorflow.python.keras.models import Sequential, Model, load_model
 from tensorflow.python.keras.callbacks import TensorBoard
-from tensorflow.python.keras.backend import batch_normalization
 import pandas as pd
 import numpy as np
 
@@ -45,7 +44,6 @@ class BuildModel():
         self.TIMESTEP = 20
         self.DATA_DIM = 1
         self.model = None
-        self.rnnLayer = None
         self.input = None
         self.output = None
         self.x_train = None
@@ -74,35 +72,44 @@ class BuildModel():
         :return: the output tensor.
         """
         o1 = RNN(MinimalRNNCell(32, "tanh"), return_sequences=True)(self.input)
-        o1 = batch_normalization(o1, 0, 1, 0, 1)
+        o1 = BatchNormalization(1)(o1)
         o2 = RNN(MinimalRNNCell(32, "tanh"), return_sequences=True)(o1)
-        # o2 = batch_normalization(o2, 0, 1, 0, 1)
+        o2 = BatchNormalization(1)(o2)
         o3 = RNN(MinimalRNNCell(32, "tanh"), return_sequences=True)(o2)
-        # o3 = batch_normalization(o3, 0, 1, 0, 1)
+        o3 = BatchNormalization(1)(o3)
         o4 = RNN(MinimalRNNCell(32, "tanh"), return_sequences=False)(o3)
         o5 = Dense(1, activation="relu")(o4)
         self.output = o5
 
-    def build_model(self):
+    def build_model(self, if_load_old_model=False):
         if self.input is None:
             self.__get_data()
-        if self.rnnLayer is None:
-            self.rnnLayer = self.__built_multi_cell_Layer()
-
+        if self.output is None:
+            self.__built_multi_cell_Layer()
         if self.model is None:
-            try:
-                self.model = load_model("model_sec.h5")
-                self.history = self.model.fit(self.x_train, self.y_train, 20, epochs=50, verbose=2)
-                self.model.save("./model_sec.h5")
-            except:
-                if not isinstance(self.model, Sequential):
-                    print(self.input.shape, self.output.shape)
-                    self.model = Model(inputs=self.input, outputs=self.output)
-                    print(self.model.summary())
-                    self.model.compile("adam", loss="mae", metrics=["mae"])
-                    print(self.model.summary())
-                    self.model.fit(self.x_train, self.y_train, 100, 50, 0, validation_split=0.2, callbacks=[TensorBoard('./logs')])
-                    self.model.save("./model_sec.h5")
+            # try:
+            self.model = load_model(r".\model_sec.h5", custom_objects={'MinimalRNNCell':MinimalRNNCell})
+            history = self.model.fit(self.x_train, self.y_train, 20, epochs=200, verbose=2, callbacks=[TensorBoard('./log1')])
+            self.history = history.history
+            self.model.save("./model_sec_1_1.h5")
+            self._write_val_loss_to_csv()
+            # except:
+            #     if not isinstance(self.model, Sequential):
+            #         print(self.input.shape, self.output.shape)
+            #         self.model = Model(inputs=self.input, outputs=self.output)
+            #         self.model.compile("adam", loss="mae", metrics=["mae"])
+            #         print(self.model.summary())
+            #         print(self.x_train.shape, self.y_train.shape)
+            #         history = self.model.fit(self.x_train, self.y_train, 50, 50, 1, validation_split=0.2, callbacks=[TensorBoard()])
+            #         self.history = history.history
+            #         self.model.save("./model_sec.h5")
+            #         self._write_val_loss_to_csv()
+
+    def _write_val_loss_to_csv(self):
+        val_loss = self.history['val_loss']
+        val_loss = np.asarray(val_loss, dtype=np.float32)
+        df = pd.DataFrame(val_loss)
+        df.to_csv('./val_loss_2.csv', mode='a', header=False)
 
 
 if __name__ == "__main__":
