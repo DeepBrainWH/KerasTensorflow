@@ -51,6 +51,6 @@ if __name__ == '__main__':
         old_data = predict.get_data()
         for i in range(22):
             predict_data, old_data = predict.predict(old_data, model_path)
-            y.append(predict_data)
+            y.append(predict_data * 4920.613604 + 2872.819729)
         y = np.asarray(y, dtype=np.float32)
         print(y)

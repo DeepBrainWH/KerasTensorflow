@@ -2,7 +2,6 @@
 """
     此模型是z-hack算法比赛的另外一个模型，使用RNN进行训练和预测
 """
-import tensorflow as tf
 from tensorflow.python.keras.layers import Dense, RNN, Layer
 from tensorflow.python.keras import backend as K
 from tensorflow.python.keras import Input, activations
