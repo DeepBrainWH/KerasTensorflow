@@ -56,15 +56,15 @@ class BuildModel():
         x = []
         y = []
         data = self.original_data.iloc[:, -1].values
-        for i in range(len(data) - self.TIMESTEP):
+        for i in range(len(data) - self.TIMESTEP *2 - 1):
             x.append(data[i:i + self.TIMESTEP])
-            y.append(data[i + self.TIMESTEP])
+            y.append(data[i + self.TIMESTEP:i+self.TIMESTEP * 2 + 1])
         x = np.asarray(x, dtype=np.float32)
         x = (x - x.min()) / (x.max() - x.min())
         y = np.asarray(y, dtype=np.float32)
         y = (y - y.min()) / (y.max() - y.min())
         self.x_train = x.reshape([x.shape[0], x.shape[1], 1])
-        self.y_train = y.reshape([y.shape[0], 1])
+        self.y_train = y.reshape([y.shape[0], 21])
         self.input = Input(shape=(20, 1), name="input_tensor")
 
     def __built_multi_cell_Layer(self):
@@ -78,7 +78,7 @@ class BuildModel():
         o3 = RNN(MinimalRNNCell(32, "tanh"), return_sequences=True)(o2)
         o3 = BatchNormalization(1)(o3)
         o4 = RNN(MinimalRNNCell(32, "tanh"), return_sequences=False)(o3)
-        o5 = Dense(1, activation="relu")(o4)
+        o5 = Dense(21, activation="relu")(o4)
         self.output = o5
 
     def build_model(self, if_load_old_model=False):
@@ -87,32 +87,38 @@ class BuildModel():
         if self.output is None:
             self.__built_multi_cell_Layer()
         if self.model is None:
-            # try:
-            self.model = load_model(r".\model_sec.h5", custom_objects={'MinimalRNNCell':MinimalRNNCell})
-            history = self.model.fit(self.x_train, self.y_train, 20, epochs=200, verbose=2, callbacks=[TensorBoard('./log1')])
-            self.history = history.history
-            self.model.save("./model_sec_1_1.h5")
-            self._write_val_loss_to_csv()
-            # except:
-            #     if not isinstance(self.model, Sequential):
-            #         print(self.input.shape, self.output.shape)
-            #         self.model = Model(inputs=self.input, outputs=self.output)
-            #         self.model.compile("adam", loss="mae", metrics=["mae"])
-            #         print(self.model.summary())
-            #         print(self.x_train.shape, self.y_train.shape)
-            #         history = self.model.fit(self.x_train, self.y_train, 50, 50, 1, validation_split=0.2, callbacks=[TensorBoard()])
-            #         self.history = history.history
-            #         self.model.save("./model_sec.h5")
-            #         self._write_val_loss_to_csv()
+            try:
+                if if_load_old_model:
+                    self.model = load_model("./model_tensorboard_2.h5", custom_objects={'MinimalRNNCell':MinimalRNNCell})
+                    print("train prepare model.......")
+                    history = self.model.fit(self.x_train, self.y_train, 20, epochs=500, verbose=2, callbacks=[TensorBoard('./log2')])
+                    self.history = history.history
+                    self.model.save("./model_tensorboard_3.h5")
+                    self._write_val_loss_to_csv('./val_loss_3.csv', 'mean_absolute_error')
+                else:
+                    if not isinstance(self.model, Sequential):
+                        print("train new model .......")
+                        print(self.input.shape, self.output.shape)
+                        self.model = Model(inputs=self.input, outputs=self.output)
+                        self.model.compile("adam", loss="mae", metrics=["mae"])
+                        print(self.model.summary())
+                        print(self.x_train.shape, self.y_train.shape)
+                        history = self.model.fit(self.x_train, self.y_train, 50, 1000, 1, validation_split=0.2,
+                                                 callbacks=[TensorBoard()])
+                        self.history = history.history
+                        self.model.save("./model_tensorboard_1.h5")
+                        self._write_val_loss_to_csv('./val_loss_2.csv')
+            except:
+                raise BaseException
 
-    def _write_val_loss_to_csv(self):
-        val_loss = self.history['val_loss']
+    def _write_val_loss_to_csv(self, file_name, keys):
+        val_loss = self.history[keys]
         val_loss = np.asarray(val_loss, dtype=np.float32)
         df = pd.DataFrame(val_loss)
-        df.to_csv('./val_loss_2.csv', mode='a', header=False)
+        df.to_csv(file_name, mode='a', header=False)
 
 
 if __name__ == "__main__":
     mymodel = BuildModel()
-    mymodel.build_model()
+    mymodel.build_model(True)
     # mymodel = load_model(r"model_sec.h5",custom_objects={"MinimalRNNCell":MinimalRNNCell})
