@@ -2,7 +2,7 @@
 .idea/
 **/*.csv
 **/*.h5
-CNN/
+CNN/.ipynb_checkpoints/
 RNN/.ipynb_checkpoints/
 RNN/data/
 chapter_7/.ipynb_checkpoints/
@@ -10,8 +10,10 @@ chapter_8/.ipynb_checkpoints/
 chapter_9/.ipynb_checkpoints/
 machineLearning/.ipynb_checkpoints/
 machineLearning/images/
-recommend/
-tensorflow/
+recommend/.ipynb_checkpoints/
+recommend/ml-100k/
+recommend/ml-100k.zip.md5
+tensorflow/.ipynb_checkpoints/
 z_hack/model/.ipynb_checkpoints/
 z_hack/model/model_py/mjl/.ipynb_checkpoints/
 z_hack/model/model_py/mjl/__pycache__/
