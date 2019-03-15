@@ -89,12 +89,12 @@ class BuildModel():
         if self.model is None:
             try:
                 if if_load_old_model:
-                    self.model = load_model("./model_tensorboard_2.h5", custom_objects={'MinimalRNNCell':MinimalRNNCell})
+                    self.model = load_model("./model_tensorboard_3.h5", custom_objects={'MinimalRNNCell':MinimalRNNCell})
                     print("train prepare model.......")
-                    history = self.model.fit(self.x_train, self.y_train, 20, epochs=500, verbose=2, callbacks=[TensorBoard('./log2')])
+                    history = self.model.fit(self.x_train, self.y_train, 20, epochs=1000, verbose=1, callbacks=[TensorBoard('./log3')])
                     self.history = history.history
-                    self.model.save("./model_tensorboard_3.h5")
-                    self._write_val_loss_to_csv('./val_loss_3.csv', 'mean_absolute_error')
+                    self.model.save("./model_tensorboard_4.h5")
+                    self._write_val_loss_to_csv('./val_loss_4.csv', 'mean_absolute_error')
                 else:
                     if not isinstance(self.model, Sequential):
                         print("train new model .......")

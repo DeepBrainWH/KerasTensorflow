@@ -3,6 +3,8 @@
 """
     In this file, we will predict the value of 1th, 2014.
 """
+from __future__ import print_function, absolute_import, division
+
 import sys
 import pandas as pd
 import numpy as np
@@ -52,7 +54,7 @@ if __name__ == '__main__':
         sys.exit(0)
     else:
         predict_data = []
-        model_path = './model_tensorboard_3.h5'
+        model_path = './model_tensorboard_4.h5'
         predict = Predict()
         old_data = predict.get_data()
         for i in range(old_data.shape[0]):
