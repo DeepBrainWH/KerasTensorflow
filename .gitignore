@@ -29,3 +29,5 @@ z_hack/data/part-r-2012
 z_hack/data/part-r-2013
 CNN/software_cup3/model/logs/
 tensorflow/log/
+CNN/software_cup3/model/__pycache__/
+z_hack/model/model_py/mjl/__pycache__/
