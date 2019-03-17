@@ -2,21 +2,25 @@ import base64
 import json
 from os import listdir
 from os.path import isfile, join
+import cv2
+import numpy as np
 
 dir = "/home/wangheng/Downloads/资料下载/my_credit_card/"
 
-l2 = [f for f in listdir(dir) if isfile(join(dir, f)) and f.endswith("json")]
+image_file = [f for f in listdir(dir) if isfile(join(dir, f)) and not f.endswith("json")]
 
-# print(l2)
+for file_name in image_file:
+    file_path = dir + file_name
+    print(file_path)
+    imread = cv2.imread(file_path)
+    resize = cv2.resize(imread, (408, 306))
+    cv2.imwrite(file_path, resize)
+    print(file_path, " : ", imread.shape)
 
-with open(dir+l2[0], "r") as f:
-    print(l2[0])
-    my_dict = json.load(f)
-for key in my_dict:
-    print(key)
-data_ = my_dict['imageData']
-fh = open(dir + "base64.png", "wb")
-decode = base64.b64decode(data_)
-fh.write(decode)
-fh.close()
+# with open(dir+image_file[0].split(".")[0]+".json", "r") as f:
+#     print(image_file[0], "===", image_file[0].split(".")[0]+".json")
+#     my_dict = json.load(f)
+# for key in my_dict:
+#     print(key)
+
 
