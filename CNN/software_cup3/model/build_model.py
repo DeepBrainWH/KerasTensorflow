@@ -1,6 +1,7 @@
 from __future__ import absolute_import
-from get_data import GET_DATA
-import get_data
+from . import *
+import read_config_utils
+from CNN.software_cup3.model.get_data import GET_DATA
 import tensorflow as tf
 import numpy as np
 
@@ -27,6 +28,7 @@ class Model:
 
         w4 = tf.Variable(tf.random.normal(shape=[5, 5, 64, 16], mean=0.0, stddev=0.1))
         b4 = tf.Variable(tf.random.normal(shape=[16], mean=0.0, stddev=0.1))
+
 
         with tf.variable_scope("conv1"):
             conv1 = tf.nn.conv2d(X_, w1, [1, 1, 1, 1], "SAME")
@@ -112,5 +114,6 @@ class Model:
 
 
 if __name__ == '__main__':
-    model = Model()
-    model.build_model()
+    # model = Model()
+    print(read_config_utils.TEST_IMAGE_PATH)
+    # model.build_model()

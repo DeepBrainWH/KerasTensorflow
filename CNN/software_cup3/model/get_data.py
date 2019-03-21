@@ -4,8 +4,9 @@ import cv2
 import numpy as np
 import math
 import json
+import read_config_utils
 
-dir = "/home/wangheng/Downloads/资料下载/my_credit_card/"
+dir = read_config_utils.TEST_IMAGE_PATH
 image_file = [f for f in listdir(dir) if isfile(join(dir, f)) and not f.endswith("json")]
 
 BATCH_SIZE = 3
@@ -37,5 +38,5 @@ class GET_DATA:
         y = y.reshape(y.shape[0], -1)
         return X, y
 
-train_X, train_y = GET_DATA.get_batches_data()
-print(train_X, train_y)
+# train_X, train_y = GET_DATA.get_batches_data()
+# print(train_X, train_y)
